@@ -1,6 +1,6 @@
 import express from "express";
 import { body, validationResult, matchedData } from "express-validator";
-import { StorageAdapter, Schema } from "./storage-adapters/interface";
+import type { StorageAdapter, Schema } from "./storage-adapters/interface.ts";
 
 export default (adapter: StorageAdapter) => {
   const router = express.Router();

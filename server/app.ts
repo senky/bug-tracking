@@ -1,6 +1,6 @@
 import express from "express";
 import routes from "./routes.ts";
-import { StorageAdapter } from "./storage-adapters/interface";
+import type { StorageAdapter } from "./storage-adapters/interface.ts";
 
 export default (adapter: StorageAdapter) => {
   const app = express();

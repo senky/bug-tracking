@@ -1,4 +1,4 @@
-import { StorageAdapter, columns, Schema } from "../interface";
+import { type StorageAdapter, columns, type Schema } from "../interface.ts";
 import fs from "node:fs";
 import { parse, stringify, transform } from "csv";
 import { parse as parseSync } from "csv-parse/sync";

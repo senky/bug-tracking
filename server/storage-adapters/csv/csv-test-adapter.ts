@@ -1,4 +1,4 @@
-import { StorageAdapter, Schema } from "../interface";
+import type { StorageAdapter, Schema } from "../interface";
 
 export class CsvTestAdapter implements StorageAdapter {
   issues: Schema[] = [];
