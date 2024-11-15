@@ -63,3 +63,56 @@ describe("POST /create", () => {
     expect(adapter.issues).to.have.length(1);
   });
 });
+
+describe("PUT /close", () => {
+  beforeEach(() => {
+    adapter.issues = [
+      {
+        id: 1,
+        parentId: undefined,
+        description: "test",
+        link: "http://test.com",
+        status: "open",
+        creationTimestamp: new Date().toISOString(),
+      },
+    ];
+  });
+
+  it("should return 400 when no data are passed", async () => {
+    const response = await request(app).put("/close");
+    expect(response.status).to.equal(400);
+    expect(adapter.issues[0].status).to.equal("open");
+  });
+
+  it("should return 400 when wrong data are passed", async () => {
+    const response = await request(app).put("/close").send({
+      id: "abc",
+    });
+    expect(response.status).to.equal(400);
+    expect(adapter.issues[0].status).to.equal("open");
+  });
+
+  it("should return 400 when wrong data are passed", async () => {
+    const response = await request(app).put("/close").send({
+      id: "abc",
+    });
+    expect(response.status).to.equal(400);
+    expect(adapter.issues[0].status).to.equal("open");
+  });
+
+  it("should return 410 when non-existing ID is passed", async () => {
+    const response = await request(app).put("/close").send({
+      id: 2,
+    });
+    expect(response.status).to.equal(410);
+    expect(adapter.issues[0].status).to.equal("open");
+  });
+
+  it("should return 204 when correct data are passed", async () => {
+    const response = await request(app).put("/close").send({
+      id: 1,
+    });
+    expect(response.status).to.equal(204);
+    expect(adapter.issues[0].status).to.equal("closed");
+  });
+});

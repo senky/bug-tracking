@@ -28,9 +28,30 @@ export default (adapter: StorageAdapter) => {
     },
   );
 
-  router.post("/close", (req: express.Request, res: express.Response) => {
-    res.json({});
-  });
+  router.put(
+    "/close",
+    body("id").notEmpty().isInt(),
+    async (req: express.Request, res: express.Response) => {
+      const requestValidationResult = validationResult(req);
+      if (!requestValidationResult.isEmpty()) {
+        res.status(400).json({ errors: requestValidationResult.array() });
+        return;
+      }
+
+      const data = matchedData<{
+        id: Schema["id"];
+      }>(req);
+      try {
+        await adapter.closeIssue(data.id);
+      } catch {
+        // Issue not found
+        res.status(410).send();
+        return;
+      }
+
+      res.status(204).send();
+    },
+  );
 
   return router;
 };

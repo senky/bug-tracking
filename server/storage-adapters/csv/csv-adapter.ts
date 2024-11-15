@@ -58,5 +58,27 @@ export class CsvAdapter implements StorageAdapter {
     return id;
   }
 
-  async closeIssue(id: number): Promise<void> {}
+  async closeIssue(id: number): Promise<void> {
+    let issueClosed = false;
+    await finished(
+      fs
+        .createReadStream(dbPath)
+        .pipe(parse())
+        .pipe(
+          transform((record) => {
+            if (record.id === id) {
+              record.status = "closed";
+              issueClosed = true;
+            }
+            return record;
+          }),
+        )
+        .pipe(stringify())
+        .pipe(fs.createWriteStream(dbPath)),
+    );
+
+    if (!issueClosed) {
+      throw new Error("Issue not found");
+    }
+  }
 }
