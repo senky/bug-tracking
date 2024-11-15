@@ -26,7 +26,7 @@ export default (adapter: StorageAdapter) => {
         await adapter.addNewIssue(
           data.description,
           data.link,
-          Number(data.parentId),
+          data.parentId ? Number(data.parentId) : undefined,
         );
       } catch {
         // Parent issue not found

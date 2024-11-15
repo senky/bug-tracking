@@ -83,6 +83,17 @@ describe("POST /create", () => {
     expect(response.status).to.equal(201);
     expect(adapter.issues).to.have.length(2);
   });
+
+  it("should return 201 when correct data without parentId are passed", async () => {
+    const response = await request(app).post("/create").send({
+      description: "test",
+      link: "http://test.com",
+    });
+    expect(response.body).to.be.empty;
+    expect(response.status).to.equal(201);
+    expect(adapter.issues).to.have.length(1);
+    expect(adapter.issues[0].parentId).to.be.undefined;
+  });
 });
 
 describe("PUT /close", () => {
