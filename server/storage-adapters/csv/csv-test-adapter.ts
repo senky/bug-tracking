@@ -8,6 +8,16 @@ export class CsvTestAdapter implements StorageAdapter {
     link: string,
     parentId?: number,
   ): Promise<number> {
+    // Make sure parent ID exists.
+    if (parentId) {
+      const parentExists = this.issues.some((issue) =>
+        Number(issue.id === parentId),
+      );
+      if (!parentExists) {
+        throw new Error("Parent issue not found");
+      }
+    }
+
     const id = Number(this.issues[this.issues.length - 1]?.id) + 1 || 1;
     this.issues.push({
       id,

@@ -52,7 +52,28 @@ describe("POST /create", () => {
     expect(adapter.issues).to.have.length(0);
   });
 
+  it("should return 409 when non-existing parentId is passed", async () => {
+    const response = await request(app).post("/create").send({
+      parentId: "1",
+      description: "test",
+      link: "http://test.com",
+    });
+    expect(response.body).to.be.empty;
+    expect(response.status).to.equal(409);
+    expect(adapter.issues).to.have.length(0);
+  });
+
   it("should return 201 when correct data are passed", async () => {
+    adapter.issues = [
+      {
+        id: 1,
+        parentId: undefined,
+        description: "test",
+        link: "http://test.com",
+        status: "open",
+        creationTimestamp: new Date().toISOString(),
+      },
+    ];
     const response = await request(app).post("/create").send({
       parentId: "1",
       description: "test",
@@ -60,7 +81,7 @@ describe("POST /create", () => {
     });
     expect(response.body).to.be.empty;
     expect(response.status).to.equal(201);
-    expect(adapter.issues).to.have.length(1);
+    expect(adapter.issues).to.have.length(2);
   });
 });
 

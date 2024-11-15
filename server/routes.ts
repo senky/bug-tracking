@@ -22,7 +22,17 @@ export default (adapter: StorageAdapter) => {
         description: Schema["description"];
         link: Schema["link"];
       }>(req);
-      await adapter.addNewIssue(data.description, data.link, data.parentId);
+      try {
+        await adapter.addNewIssue(
+          data.description,
+          data.link,
+          Number(data.parentId),
+        );
+      } catch {
+        // Parent issue not found
+        res.status(409).send();
+        return;
+      }
 
       res.status(201).send();
     },
@@ -42,7 +52,7 @@ export default (adapter: StorageAdapter) => {
         id: Schema["id"];
       }>(req);
       try {
-        await adapter.closeIssue(data.id);
+        await adapter.closeIssue(Number(data.id));
       } catch {
         // Issue not found
         res.status(410).send();

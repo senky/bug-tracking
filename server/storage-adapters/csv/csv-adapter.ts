@@ -1,6 +1,7 @@
 import { StorageAdapter, columns, Schema } from "../interface";
 import fs from "node:fs";
 import { parse, stringify, transform } from "csv";
+import { parse as parseSync } from "csv-parse/sync";
 import { stringify as stringifySync } from "csv-stringify/sync";
 import { finished } from "node:stream/promises";
 
@@ -43,6 +44,19 @@ export class CsvAdapter implements StorageAdapter {
     parentId?: number,
   ): Promise<number> {
     const id = this.nextId++;
+
+    // Make sure parent ID exists.
+    if (parentId) {
+      const data = await fs.promises.readFile(dbPath, "utf-8");
+      const records = parseSync(data, { columns }) as unknown as Schema[];
+      const parentExists = records.some(
+        (issue) => Number(issue.id) === parentId,
+      );
+      if (!parentExists) {
+        throw new Error("Parent issue not found");
+      }
+    }
+
     const newIssue: Schema = {
       id,
       parentId,
