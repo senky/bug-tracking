@@ -1,9 +1,7 @@
 import { type StorageAdapter, columns, type Schema } from "../interface.ts";
 import fs from "node:fs";
-import { parse, stringify, transform } from "csv";
-import { parse as parseSync } from "csv-parse/sync";
-import { stringify as stringifySync } from "csv-stringify/sync";
-import { finished } from "node:stream/promises";
+import { parse } from "csv-parse/sync";
+import { stringify } from "csv-stringify/sync";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 const dbPath = `${__dirname}/issues.csv`;
@@ -24,18 +22,8 @@ export class CsvAdapter implements StorageAdapter {
     }
 
     // Read last line for ID to generate next ID.
-    parse(
-      data,
-      {
-        columns,
-      },
-      (err, records: Schema[]) => {
-        if (err) {
-          throw err;
-        }
-        this.nextId = Number(records[records.length - 1]?.id) + 1 || 1;
-      },
-    );
+    const records = parse(data, { columns }) as unknown as Schema[];
+    this.nextId = Number(records[records.length - 1]?.id) + 1 || 1;
   }
 
   async addNewIssue(
@@ -48,7 +36,7 @@ export class CsvAdapter implements StorageAdapter {
     // Make sure parent ID exists.
     if (parentId) {
       const data = await fs.promises.readFile(dbPath, "utf-8");
-      const records = parseSync(data, { columns }) as unknown as Schema[];
+      const records = parse(data, { columns }) as unknown as Schema[];
       const parentExists = records.some(
         (issue) => Number(issue.id) === parentId,
       );
@@ -65,34 +53,27 @@ export class CsvAdapter implements StorageAdapter {
       status: "open",
       creationTimestamp: new Date().toISOString(),
     };
-    await fs.promises.appendFile(
-      dbPath,
-      stringifySync([newIssue], { columns }),
-    );
+    await fs.promises.appendFile(dbPath, stringify([newIssue], { columns }));
     return id;
   }
 
   async closeIssue(id: number): Promise<void> {
     let issueClosed = false;
-    await finished(
-      fs
-        .createReadStream(dbPath)
-        .pipe(parse())
-        .pipe(
-          transform((record) => {
-            if (record.id === id) {
-              record.status = "closed";
-              issueClosed = true;
-            }
-            return record;
-          }),
-        )
-        .pipe(stringify())
-        .pipe(fs.createWriteStream(dbPath)),
-    );
+
+    const data = await fs.promises.readFile(dbPath, "utf-8");
+    const records = parse(data, { columns }) as unknown as Schema[];
+    const updatedRecords = records.map((record) => {
+      if (Number(record.id) === id) {
+        record.status = "closed";
+        issueClosed = true;
+      }
+      return record;
+    });
 
     if (!issueClosed) {
       throw new Error("Issue not found");
     }
+
+    await fs.promises.writeFile(dbPath, stringify(updatedRecords, { columns }));
   }
 }

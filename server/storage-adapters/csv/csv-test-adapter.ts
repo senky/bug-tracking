@@ -32,11 +32,12 @@ export class CsvTestAdapter implements StorageAdapter {
 
   async closeIssue(id: number): Promise<void> {
     let issueClosed = false;
-    this.issues.map((issue) => {
+    this.issues = this.issues.map((issue) => {
       if (issue.id === id) {
         issue.status = "closed";
         issueClosed = true;
       }
+      return issue;
     });
     if (!issueClosed) {
       throw new Error("Issue not found");
