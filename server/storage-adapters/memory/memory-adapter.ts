@@ -1,6 +1,6 @@
 import type { StorageAdapter, Schema } from "../interface";
 
-export class CsvTestAdapter implements StorageAdapter {
+export class MemoryAdapter implements StorageAdapter {
   issues: Schema[] = [];
 
   async addNewIssue(

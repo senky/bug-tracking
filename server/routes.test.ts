@@ -1,9 +1,9 @@
 import appInit from "./app";
 import { describe, it, expect, beforeEach } from "vitest";
 import request from "supertest";
-import { CsvTestAdapter } from "./storage-adapters/csv/csv-test-adapter";
+import { MemoryAdapter } from "./storage-adapters/memory/memory-adapter";
 
-const adapter = new CsvTestAdapter();
+const adapter = new MemoryAdapter();
 const app = appInit(adapter);
 
 describe("POST /create", () => {
