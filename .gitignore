@@ -1,4 +1,5 @@
 .vscode/settings.json
 client/.env
+client/dist
 node_modules
 server/storage-adapters/csv/issues.csv

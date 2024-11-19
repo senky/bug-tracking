@@ -4,7 +4,7 @@
   "description": "A bug tracking system for GoHealth assignment",
   "type": "module",
   "scripts": {
-    "client:start": "vite build client",
+    "client:build": "vite build client",
     "client:dev": "vite serve client",
     "server:start": "node --experimental-strip-types server/main.ts",
     "server:dev": "node --watch --experimental-strip-types server/main.ts",
