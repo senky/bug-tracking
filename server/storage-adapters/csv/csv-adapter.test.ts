@@ -41,7 +41,7 @@ describe("CsvAdapter", () => {
       "1,Test,,open,2021-01-01T00:00:00.000Z,http://example.com\n",
     );
     const adapter = new CsvAdapter();
-    await adapter.closeIssue(4);
+    await adapter.closeIssue(1);
     const data = fs.readFileSync(dbPath, "utf-8");
     expect(data).toMatch(RegExp("1,Test,,closed,.*,http://example.com\n"));
   });
